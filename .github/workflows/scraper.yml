@@ -45,4 +45,4 @@ jobs:
           RESEND_FROM: ${{ vars.RESEND_FROM }}
           RESEND_TO: ${{ vars.RESEND_TO }}
         run: |
-          python downloader.py
+          python scraper/scrape.py
