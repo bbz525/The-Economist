@@ -42,7 +42,7 @@ jobs:
         env:
           ECONOMIST_REPO_DIR: ${{ github.workspace }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          RESEND_FROM: ${{ vars.RESEND_FROM }}
-          RESEND_TO: ${{ vars.RESEND_TO }}
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
+          RESEND_TO: ${{ secrets.RESEND_TO }}
         run: |
           python scraper/scrape.py
