@@ -2,7 +2,7 @@ name: Downloader
 
 on:
   schedule:
-    - cron: '0 17 * * 6'
+    - cron: '59 16 * * 6'
   workflow_dispatch:
 
 permissions:
