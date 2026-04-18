@@ -36,19 +36,17 @@ jobs:
           git config --global user.name "blleng"
           git config --global user.email "lengbl@outlook.com"
 
-      - name: Configure AWS/R2 Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          aws-region: auto
 
       - name: Fetch Script from Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
         run: |
-          aws s3 cp s3://economist-scraper/scrape.py ./scrape.py --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          aws s3 cp s3://files/scrape.py ./scrape.py --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
 
           if [ ! -s scrape.py ]; then
-            echo "FATAL: Failed to download scrape.py from R2. File is empty."
+            echo "FATAL: Failed to download scrape.py from R2. File is empty or missing."
             exit 1
           fi
 
