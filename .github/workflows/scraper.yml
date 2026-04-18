@@ -43,7 +43,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
         run: |
-          aws s3 cp s3://files/scrape.py ./scrape.py --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          aws s3 cp s3://cdn/files/scrape.py ./scrape.py --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
 
           if [ ! -s scrape.py ]; then
             echo "FATAL: Failed to download scrape.py from R2. File is empty or missing."
