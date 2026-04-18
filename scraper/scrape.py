@@ -251,7 +251,7 @@ def extract_and_rename_and_push(downloaded_file, date_str):
 
     cwd = REPO_DIR
 
-    subprocess.run(["git", "add", "."], cwd=cwd, check=True)
+    subprocess.run(["git", "add", new_dir_name], cwd=cwd, check=True)
     subprocess.run(["git", "commit", "-m", f"Add {new_dir_name} and cleanup old issues"], cwd=cwd, check=False) # OK if nothing to commit
 
     if github_token and github_username and github_repo:
