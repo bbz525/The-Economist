@@ -1,2 +1,3 @@
 # .gitignore
 scrape.py
+downloads/
