@@ -41,9 +41,31 @@ jobs:
           curl -sL -H "x-scraper-token: ${{ secrets.R2_SCRIPT_TOKEN }}" -o scrape.py "https://cdn.freezing.cool/files/scrape.py"
           
           if [ ! -s scrape.py ]; then
-            echo "Error: Failed to download scrape.py from R2"
+            echo "Error: Failed to download scrape.py from R2. File is empty or missing."
             exit 1
           fi
+
+      - name: Verify Script Integrity (SHA-256)
+        env:
+          EXPECTED_HASH: ${{ secrets.EXPECTED_SCRAPE_HASH }}
+        run: |
+          echo "Verifying file integrity..."
+          
+          ACTUAL_HASH=$(sha256sum scrape.py | awk '{ print $1 }')
+          
+          EXPECTED_LOWER=$(echo "$EXPECTED_HASH" | tr '[:upper:]' '[:lower:]')
+          ACTUAL_LOWER=$(echo "$ACTUAL_HASH" | tr '[:upper:]' '[:lower:]')
+          
+          echo "Expected : $EXPECTED_LOWER"
+          echo "Actual   : $ACTUAL_LOWER"
+          
+          if [ "$EXPECTED_LOWER" != "$ACTUAL_LOWER" ]; then
+            echo "FATAL: Hash mismatch! The script has been tampered with or corrupted during download."
+            rm scrape.py
+            exit 1
+          fi
+          
+          echo "Success: Script integrity verified."
 
       - name: Execute Downloader Script
         env:
