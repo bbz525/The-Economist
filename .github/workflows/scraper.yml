@@ -36,20 +36,17 @@ jobs:
           git config --global user.name "blleng"
           git config --global user.email "lengbl@outlook.com"
 
+      - name: Configure AWS/R2 Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          aws-region: auto
+
       - name: Fetch Script from Cloudflare R2
         run: |
-          curl -sL \
-            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            -H "x-scraper-token: ${{ secrets.R2_SCRIPT_TOKEN }}" \
-            -o scrape.py "https://cdn.freezing.cool/scrape.py"
-          
-          if grep -iq "<html" scrape.py; then
-            echo "FATAL: Downloaded file is an HTML page. Cloudflare interception is still active."
-            echo "--- Debug: HTML Content Snippet ---"
-            head -n 15 scrape.py
-            exit 1
-          fi
-          
+          aws s3 cp s3://economist-scraper/scrape.py ./scrape.py --endpoint-url https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+
           if [ ! -s scrape.py ]; then
             echo "FATAL: Failed to download scrape.py from R2. File is empty."
             exit 1
@@ -60,21 +57,21 @@ jobs:
           EXPECTED_HASH: ${{ secrets.EXPECTED_SCRAPE_HASH }}
         run: |
           echo "Verifying file integrity..."
-          
+
           ACTUAL_HASH=$(sha256sum scrape.py | awk '{ print $1 }')
-          
+
           EXPECTED_LOWER=$(echo "$EXPECTED_HASH" | tr '[:upper:]' '[:lower:]')
           ACTUAL_LOWER=$(echo "$ACTUAL_HASH" | tr '[:upper:]' '[:lower:]')
-          
+
           echo "Expected : $EXPECTED_LOWER"
           echo "Actual   : $ACTUAL_LOWER"
-          
+
           if [ "$EXPECTED_LOWER" != "$ACTUAL_LOWER" ]; then
             echo "FATAL: Hash mismatch! The script has been tampered with or corrupted during download."
             rm scrape.py
             exit 1
           fi
-          
+
           echo "Success: Script integrity verified."
 
       - name: Execute Downloader Script
