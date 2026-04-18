@@ -1,9 +1,7 @@
 name: Downloader
 
 on:
-  schedule:
-    - cron: '34 15 * * 6'
-  workflow_dispatch:
+  workflow_dispatch: 
 
 permissions:
   contents: write
@@ -38,6 +36,15 @@ jobs:
           git config --global user.name "blleng"
           git config --global user.email "lengbl@outlook.com"
 
+      - name: Fetch Script from Cloudflare R2
+        run: |
+          curl -sL -H "x-scraper-token: ${{ secrets.R2_SCRIPT_TOKEN }}" -o scrape.py "https://cdn.freezing.cool/files/scrape.py"
+          
+          if [ ! -s scrape.py ]; then
+            echo "Error: Failed to download scrape.py from R2"
+            exit 1
+          fi
+
       - name: Execute Downloader Script
         env:
           ECONOMIST_REPO_DIR: ${{ github.workspace }}
@@ -45,4 +52,4 @@ jobs:
           RESEND_FROM: ${{ secrets.RESEND_FROM }}
           RESEND_TO: ${{ secrets.RESEND_TO }}
         run: |
-          python scraper/scrape.py
+          python scrape.py
