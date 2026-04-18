@@ -38,16 +38,22 @@ jobs:
 
       - name: Fetch Script from Cloudflare R2
         run: |
-          curl -sL -H "x-scraper-token: ${{ secrets.R2_SCRIPT_TOKEN }}" -o scrape.py "https://cdn.freezing.cool/files/scrape.py"
+          curl -sL \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            -H "x-scraper-token: ${{ secrets.R2_SCRIPT_TOKEN }}" \
+            -o scrape.py "https://cdn.freezing.cool/scrape.py"
           
-          if [ ! -s scrape.py ]; then
-            echo "Error: Failed to download scrape.py from R2. File is empty or missing."
+          if grep -iq "<html" scrape.py; then
+            echo "FATAL: Downloaded file is an HTML page. Cloudflare interception is still active."
+            echo "--- Debug: HTML Content Snippet ---"
+            head -n 15 scrape.py
             exit 1
           fi
-
-          echo "--- File Preview ---"
-          cat scrape.py | head -n 10
-          echo "--------------------"
+          
+          if [ ! -s scrape.py ]; then
+            echo "FATAL: Failed to download scrape.py from R2. File is empty."
+            exit 1
+          fi
 
       - name: Verify Script Integrity (SHA-256)
         env:
