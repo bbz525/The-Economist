@@ -45,6 +45,10 @@ jobs:
             exit 1
           fi
 
+          echo "--- File Preview ---"
+          cat scrape.py | head -n 10
+          echo "--------------------"
+
       - name: Verify Script Integrity (SHA-256)
         env:
           EXPECTED_HASH: ${{ secrets.EXPECTED_SCRAPE_HASH }}
