@@ -30,7 +30,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests py7zr resend python-dotenv beautifulsoup4 playwright
+          pip install requests py7zr resend python-dotenv beautifulsoup4 playwright playwright-stealth
 
       - name: Install Playwright Browsers
         run: |
